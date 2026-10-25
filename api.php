@@ -31,6 +31,26 @@ set_exception_handler(function ($e) {
 
 if (isset($_GET['status'])) {
     $dir = $VEILLE_CONFIG['cache_dir'];
+    $test = null;
+    if (isset($_GET['test'])) {
+        // Essai réel de connexion au premier flux, avec le détail de l'erreur.
+        $url = $VEILLE_CATEGORIES[0]['feed'];
+        $host = parse_url($url, PHP_URL_HOST);
+        $ip = gethostbyname($host);
+        $t0 = microtime(true);
+        $r = veille_http_get($url, $VEILLE_CONFIG['timeout'], $VEILLE_CONFIG['user_agent'], 3, $VEILLE_CONFIG['proxy']);
+        $test = array(
+            'host'     => $host,
+            'dns'      => $ip !== $host ? 'ok' : 'échec (nom non résolu)',
+            'proxy'    => $VEILLE_CONFIG['proxy'] !== '' ? 'oui' : 'non',
+            'ok'       => $r['ok'],
+            'http'     => $r['status'],
+            'method'   => $r['method'],
+            'ms'       => (int) round((microtime(true) - $t0) * 1000),
+            'error'    => $r['error'],
+            'env_proxy'=> getenv('HTTPS_PROXY') ?: (getenv('https_proxy') ?: (getenv('HTTP_PROXY') ?: '')),
+        );
+    }
     veille_json(array(
         'ok'              => true,
         'php'             => PHP_VERSION,
@@ -40,6 +60,7 @@ if (isset($_GET['status'])) {
         'simplexml'       => function_exists('simplexml_load_string'),
         'cache_writable'  => (is_dir($dir) || @mkdir($dir, 0755, true)) && is_writable($dir),
         'snapshot'        => is_file($VEILLE_CONFIG['snapshot_file']),
+        'test'            => $test,
     ));
 }
 

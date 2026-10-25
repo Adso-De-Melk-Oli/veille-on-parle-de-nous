@@ -10,16 +10,18 @@
  * Compatible PHP 5.6 → 8.x.
  */
 
-function veille_http_get($url, $timeout, $userAgent, $redirects = 3)
+function veille_http_get($url, $timeout, $userAgent, $redirects = 3, $proxy = '')
 {
     $errors = array();
 
     if (veille_ini_on('allow_url_fopen')) {
-        $r = veille_http_fopen($url, $timeout, $userAgent);
+        $r = veille_http_fopen($url, $timeout, $userAgent, $proxy);
         if ($r['ok']) {
             return $r;
         }
-        $errors[] = 'fopen: ' . $r['error'];
+        // Une socket brute passerait par le même réseau et échouerait de la même façon :
+        // elle ne sert que lorsque allow_url_fopen est désactivé.
+        return array('ok' => false, 'status' => $r['status'], 'body' => '', 'error' => 'fopen: ' . $r['error'], 'method' => 'fopen');
     } else {
         $errors[] = 'fopen: allow_url_fopen désactivé';
     }
@@ -39,17 +41,23 @@ function veille_ini_on($key)
     return $v === '1' || $v === 'on' || $v === 'true' || $v === 'yes';
 }
 
-function veille_http_fopen($url, $timeout, $userAgent)
+function veille_http_fopen($url, $timeout, $userAgent, $proxy = '')
 {
-    $ctx = stream_context_create(array(
-        'http' => array(
+    $http = array(
             'method'          => 'GET',
             'timeout'         => $timeout,
             'follow_location' => 1,
             'max_redirects'   => 4,
             'ignore_errors'   => true,
             'header'          => "User-Agent: $userAgent\r\nAccept: application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.5\r\nConnection: close\r\n",
-        ),
+    );
+    if ($proxy !== '') {
+        // Proxy sortant de l'établissement, ex. tcp://proxy.exemple.fr:3128
+        $http['proxy'] = $proxy;
+        $http['request_fulluri'] = true;
+    }
+    $ctx = stream_context_create(array(
+        'http' => $http,
         'ssl' => array('verify_peer' => true, 'verify_peer_name' => true),
     ));
 

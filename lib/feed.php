@@ -444,7 +444,18 @@ function veille_get_category($cfg, $cat, $forceRefresh = false)
 
     $error = '';
     $items = null;
-    $res = veille_http_get($cat['feed'], $cfg['timeout'], $cfg['user_agent']);
+    $host = parse_url($cat['feed'], PHP_URL_HOST);
+    $down = veille_host_down($cfg, $host);
+    if ($down !== '' && !$forceRefresh) {
+        // Le serveur du flux vient d'échouer pour une autre rubrique : inutile d'attendre à nouveau.
+        $res = array('ok' => false, 'status' => 0, 'error' => $down);
+    } else {
+        $proxy = isset($cfg['proxy']) ? (string) $cfg['proxy'] : '';
+        $res = veille_http_get($cat['feed'], $cfg['timeout'], $cfg['user_agent'], 3, $proxy);
+        if (!$res['ok'] && $res['status'] === 0) {
+            veille_host_mark_down($cfg, $host, $res['error']);
+        }
+    }
     if ($res['ok']) {
         try {
             $items = veille_parse_feed($res['body'], $cfg['limit']);
@@ -483,6 +494,29 @@ function veille_get_category($cfg, $cat, $forceRefresh = false)
     }
 
     return array('items' => array(), 'status' => 'error', 'fetched' => null, 'error' => $error);
+}
+
+/**
+ * Disjoncteur par hôte : après un échec réseau (délai, DNS, refus), plus aucun appel vers ce serveur
+ * pendant 5 minutes. Évite qu'une page attende 12 × le délai quand Inoreader est injoignable.
+ */
+function veille_host_down($cfg, $host)
+{
+    $f = rtrim($cfg['cache_dir'], '/') . '/_hote-' . preg_replace('/[^a-z0-9.-]/i', '', (string) $host) . '.json';
+    if (!is_file($f)) {
+        return '';
+    }
+    $d = json_decode((string) @file_get_contents($f), true);
+    return (is_array($d) && isset($d['until']) && $d['until'] > time()) ? (string) $d['error'] : '';
+}
+
+function veille_host_mark_down($cfg, $host, $error)
+{
+    $dir = rtrim($cfg['cache_dir'], '/');
+    if (is_dir($dir) && is_writable($dir)) {
+        @file_put_contents($dir . '/_hote-' . preg_replace('/[^a-z0-9.-]/i', '', (string) $host) . '.json',
+            json_encode(array('until' => time() + 300, 'error' => $error)));
+    }
 }
 
 /** Lecture sans réseau (cache puis instantané) : sert au premier affichage instantané de la page. */

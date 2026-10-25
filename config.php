@@ -18,7 +18,9 @@ $VEILLE_CONFIG = array(
     // Au-delà de cet âge, une donnée en cache n'est plus affichée même si le flux est en panne (secondes). 30 jours.
     'stale_max'      => 2592000,
     // Délai maximal pour joindre un flux (secondes).
-    'timeout'        => 8,
+    'timeout'        => 6,
+    // Proxy sortant, si le réseau de l'établissement en impose un (ex. 'tcp://proxy.supagro.fr:3128'). Vide = aucun.
+    'proxy'          => '',
     // Nombre d'articles par rubrique.
     'limit'          => 20,
     'cache_dir'      => VEILLE_ROOT . '/cache',
