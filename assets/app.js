@@ -13,6 +13,7 @@
   var CATS = BOOT.categories;
   var byKey = {};
   CATS.forEach(function (c) { byKey[c.key] = c; });
+  var DEFAULT = byKey[BOOT.default] ? BOOT.default : CATS[0].key;
 
   var PAGE = 12;                 // cartes affichées avant « Voir plus »
   var NEW_DAYS = 7;              // pastille « nouveau » dans les filtres
@@ -398,9 +399,9 @@
       if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
     document.body.setAttribute('data-cat', key);
-    document.title = (key === CATS[0].key ? 'On parle de nous — Veille presse et web' : byKey[key].label + ' — On parle de nous') + " · L'Institut Agro Montpellier";
+    document.title = (key === DEFAULT ? 'On parle de nous — Veille presse et web' : byKey[key].label + ' — On parle de nous') + " · L'Institut Agro Montpellier";
     if (push) {
-      var url = key === CATS[0].key ? location.pathname : location.pathname + '?cat=' + encodeURIComponent(key);
+      var url = key === DEFAULT ? location.pathname : location.pathname + '?cat=' + encodeURIComponent(key);
       history.pushState({ cat: key }, '', url);
       if (window._paq) { window._paq.push(['setCustomUrl', location.href]); window._paq.push(['trackPageView', byKey[key].label]); }
     }
@@ -451,7 +452,7 @@
 
   window.addEventListener('popstate', function () {
     var m = /[?&]cat=([^&]+)/.exec(location.search);
-    select(m ? decodeURIComponent(m[1]) : CATS[0].key, false);
+    select(m ? decodeURIComponent(m[1]) : DEFAULT, false);
   });
 
   // Recherche

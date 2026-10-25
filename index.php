@@ -15,7 +15,9 @@ require __DIR__ . '/lib/render.php';
 ini_set('display_errors', '0');
 
 // Rubrique demandée : ?cat=vigne (nouveau) ou ?id=2 (anciens permaliens).
-$active = $VEILLE_CATEGORIES[0];
+$default = veille_find_category($VEILLE_CATEGORIES, $VEILLE_CONFIG['default_cat']);
+if (!$default) { $default = $VEILLE_CATEGORIES[0]; }
+$active = $default;
 if (isset($_GET['cat'])) {
     $c = veille_find_category($VEILLE_CATEGORIES, (string) $_GET['cat']);
     if ($c) { $active = $c; }
@@ -31,6 +33,7 @@ $boot = array(
     'remote'     => $VEILLE_CONFIG['remote_snapshot'],
     'snapshot'   => 'data/feeds.json',
     'active'     => $active['key'],
+    'default'    => $default['key'],
     'categories' => array(),
     'initial'    => array('cat' => $active['key'], 'items' => $initial['items'], 'fetched' => $initial['fetched']),
 );
@@ -38,10 +41,10 @@ foreach ($VEILLE_CATEGORIES as $c) {
     $boot['categories'][] = array('id' => $c['id'], 'key' => $c['key'], 'label' => $c['label'], 'group' => $c['group'], 'color' => $c['color'], 'feed' => $c['feed']);
 }
 
-$pageTitle = $active['key'] === $VEILLE_CATEGORIES[0]['key']
+$pageTitle = $active['key'] === $default['key']
     ? "On parle de nous — Veille presse et web · L'Institut Agro Montpellier"
     : $active['label'] . " — On parle de nous · L'Institut Agro Montpellier";
-$canonical = $VEILLE_CONFIG['site_url'] . ($active['key'] === $VEILLE_CATEGORIES[0]['key'] ? '' : '?cat=' . rawurlencode($active['key']));
+$canonical = $VEILLE_CONFIG['site_url'] . ($active['key'] === $default['key'] ? '' : '?cat=' . rawurlencode($active['key']));
 $desc = "Ce que la presse et le web disent de l'Institut Agro et de l'Institut Agro Montpellier : articles classés par grands thèmes et axes stratégiques, mis à jour en continu.";
 $e = 'veille_e';
 $v = '3.0.0';

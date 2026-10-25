@@ -21,6 +21,8 @@ $VEILLE_CONFIG = array(
     'timeout'        => 6,
     // Proxy sortant, si le réseau de l'établissement en impose un (ex. 'tcp://proxy.supagro.fr:3128'). Vide = aucun.
     'proxy'          => '',
+    // Rubrique affichée à l'ouverture de la page (sans ?cat= dans l'adresse).
+    'default_cat'    => 'general',
     // Nombre d'articles par rubrique.
     'limit'          => 20,
     'cache_dir'      => VEILLE_ROOT . '/cache',
@@ -37,9 +39,9 @@ $VEILLE_CONFIG = array(
 $VEILLE_CATEGORIES = array(
     array('id' => 0,  'key' => 'institut',      'group' => 'Établissement',     'label' => "L'Institut Agro",                'color' => 'orange', 'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/Institut%20Agro'),
     array('id' => 1,  'key' => 'general',       'group' => 'Établissement',     'label' => 'Général',                        'color' => 'orange', 'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/general'),
-    array('id' => 2,  'key' => 'vigne',         'group' => 'Pôles',             'label' => 'Vigne et vin',                   'color' => 'purple', 'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/IHEV'),
-    array('id' => 3,  'key' => 'sud',           'group' => 'Pôles',             'label' => 'Développement durable au sud',   'color' => 'green',  'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/IRC'),
-    array('id' => 4,  'key' => 'enseignement',  'group' => 'Pôles',             'label' => "Appui à l'enseignement agricole", 'color' => 'blue',   'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/FLORAC'),
+    array('id' => 2,  'key' => 'vigne',         'group' => 'Thématiques',       'label' => 'Vigne et vin',                   'color' => 'purple', 'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/IHEV'),
+    array('id' => 3,  'key' => 'sud',           'group' => 'Thématiques',       'label' => 'Développement durable au sud',   'color' => 'green',  'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/IRC'),
+    array('id' => 4,  'key' => 'enseignement',  'group' => 'Thématiques',       'label' => "Appui à l'enseignement agricole", 'color' => 'blue',   'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/FLORAC'),
     array('id' => 5,  'key' => 'alimentation',  'group' => 'Axes stratégiques', 'label' => 'Alimentation durable',           'color' => 'pink',   'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/alimentation-durable'),
     array('id' => 6,  'key' => 'numerique',     'group' => 'Axes stratégiques', 'label' => 'Agriculture numérique',          'color' => 'blue',   'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/Agriculture%20Num%C3%A9rique'),
     array('id' => 7,  'key' => 'agroecologie',  'group' => 'Axes stratégiques', 'label' => 'Agro-écologie',                  'color' => 'green',  'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/Agro-%C3%A9cologie'),
