@@ -1,0 +1,4 @@
+cache/*
+!cache/.htaccess
+config.local.php
+.DS_Store

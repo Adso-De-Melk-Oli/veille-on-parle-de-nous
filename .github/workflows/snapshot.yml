@@ -1,0 +1,45 @@
+# Met à jour chaque matin data/feeds.json, l'instantané de secours affiché
+# quand un flux est en panne et que le serveur n'a encore aucun cache.
+name: Instantané de la veille
+
+on:
+  schedule:
+    - cron: "17 5 * * *"   # chaque matin, vers 6h-7h heure de Paris
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: simplexml, openssl, mbstring
+          coverage: none
+      - name: Lire les flux
+        run: php scripts/snapshot.php
+      - name: Enregistrer s'il y a du nouveau
+        run: |
+          if git diff --quiet -- data/feeds.json; then echo "Rien de nouveau"; exit 0; fi
+          git config user.name "veille-bot"
+          git config user.email "veille-bot@users.noreply.github.com"
+          git add data/feeds.json
+          git commit -m "Instantané de la veille du $(date -u +%F)"
+          git push
+
+      # Facultatif : publier automatiquement sur le serveur SupAgro par FTP.
+      # Créer les secrets FTP_SERVER, FTP_USERNAME, FTP_PASSWORD dans le dépôt, puis décommenter.
+      # - uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      #   with:
+      #     server: ${{ secrets.FTP_SERVER }}
+      #     username: ${{ secrets.FTP_USERNAME }}
+      #     password: ${{ secrets.FTP_PASSWORD }}
+      #     server-dir: /web/services/on-parle-de-nous/
+      #     exclude: |
+      #       **/.git*/**
+      #       tests/**
+      #       cache/*.json
