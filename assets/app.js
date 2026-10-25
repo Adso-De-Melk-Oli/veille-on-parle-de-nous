@@ -5,6 +5,7 @@
 (function () {
   'use strict';
 
+  document.documentElement.classList.add('js');
   var bootEl = document.getElementById('veille-boot');
   if (!bootEl) return;
   var BOOT;
@@ -408,6 +409,9 @@
       if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
     document.body.setAttribute('data-cat', key);
+    var tl = $('[data-slot-toggle]'), td = $('[data-slot-toggle-dot]');
+    if (tl) tl.textContent = byKey[key].label;
+    if (td) td.className = 'filter__dot c-' + byKey[key].color;
     document.title = (key === DEFAULT ? 'On parle de nous — Veille presse et web' : byKey[key].label + ' — On parle de nous') + " · L'Institut Agro Montpellier";
     if (push) {
       var url = key === DEFAULT ? location.pathname : location.pathname + '?cat=' + encodeURIComponent(key);
@@ -425,11 +429,13 @@
       if (state.queryAll && state.query) { state.query = ''; $('#q').value = ''; }
       select(f.getAttribute('data-cat'), true);
       if (window.matchMedia('(max-width: 960px)').matches) {
-        f.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+        setMenu(false);
         main.scrollIntoView({ block: 'start', behavior: 'smooth' });
       }
       return;
     }
+    var tg = e.target.closest('.filters__toggle');
+    if (tg) { setMenu(tg.getAttribute('aria-expanded') !== 'true'); return; }
     var a = e.target.closest('[data-action]');
     if (!a) return;
     var act = a.getAttribute('data-action');
@@ -445,6 +451,18 @@
     } else if (act === 'copy-permalink') {
       copy(location.href);
     }
+  });
+
+  // Mobile : ouverture / fermeture de la liste des rubriques
+  function setMenu(open) {
+    var box = $('.filters'), btn = $('.filters__toggle');
+    if (!box || !btn) return;
+    box.classList.toggle('is-open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) { var a = $('.filter.is-active'); if (a) a.focus({ preventScroll: true }); }
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && $('.filters.is-open')) { setMenu(false); $('.filters__toggle').focus(); }
   });
 
   // Flèches haut/bas dans la liste des rubriques
@@ -515,12 +533,6 @@
 
   /* ---------------------------------------------------------------- Démarrage */
   if (state.data[state.active]) updateCount(state.active);
-  // Mobile : la pastille active est visible dans la barre défilante.
-  var act = $('.filter.is-active');
-  if (act && window.matchMedia('(max-width: 960px)').matches) {
-    var nav = act.closest('nav');
-    nav.scrollLeft = act.offsetLeft - nav.clientWidth / 2 + act.clientWidth / 2;
-  }
   render();
   load(state.active, true, false).then(function () { render(); preloadOthers(); });
 })();

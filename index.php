@@ -115,7 +115,12 @@ $v = '3.0.0';
       <input id="q" type="search" placeholder="Un mot, un média…" autocomplete="off">
       <label class="search__scope"><input type="checkbox" id="q-all"> dans toutes les rubriques</label>
     </div>
-    <nav>
+    <button class="filters__toggle" type="button" aria-expanded="false" aria-controls="rubriques">
+      <span class="filter__dot c-<?php echo $e($active['color']); ?>" aria-hidden="true" data-slot-toggle-dot></span>
+      <span class="filters__toggle-label">Rubrique :<strong data-slot-toggle><?php echo $e($active['label']); ?></strong></span>
+      <span class="filters__toggle-chev" aria-hidden="true"></span>
+    </button>
+    <nav id="rubriques" aria-label="Rubriques">
       <?php echo veille_render_filters($VEILLE_CATEGORIES, $active['key']); ?>
     </nav>
     <details class="about">
