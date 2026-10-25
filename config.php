@@ -34,6 +34,8 @@ $VEILLE_CONFIG = array(
     'user_agent'     => 'VeilleInstitutAgroMontpellier/3.0 (+https://www.supagro.fr/web/services/on-parle-de-nous/)',
     'site_url'       => 'https://www.supagro.fr/web/services/on-parle-de-nous/',
     'matomo_site_id' => 18,
+    // Page de diagnostic api.php?status=1&test=1. À n'activer que le temps d'un dépannage.
+    'diagnostic'     => false,
 );
 
 $VEILLE_CATEGORIES = array(

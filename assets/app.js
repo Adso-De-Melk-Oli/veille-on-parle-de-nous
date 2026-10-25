@@ -99,7 +99,8 @@
     if (!force && state.pending[key]) return state.pending[key];
 
     var p = loadRemote(refresh).then(function (remote) {
-      var c = remote && remote.categories[key];
+      var c = remote && remote.categories && remote.categories[key];
+      if (c && Array.isArray(c.items)) c = { fetched: c.fetched, items: c.items.filter(function (it) { return it && safeUrl(it.link) && it.title; }) };
       if (c && c.items && c.items.length) {
         var fetched = c.fetched || remote.generated || null;
         var age = fetched ? (Date.now() - new Date(fetched).getTime()) / 3600000 : 0;
@@ -210,15 +211,23 @@
     return out + esc(text.slice(pos));
   }
 
+  // Les données viennent de l'extérieur (flux, GitHub) : seuls les liens http(s) sont acceptés.
+  function safeUrl(u) {
+    u = String(u || '').trim();
+    return /^https?:\/\//i.test(u) ? u : '';
+  }
+
   function card(it, i, opts) {
+    it = { title: String(it.title || ''), excerpt: String(it.excerpt || ''), source: String(it.source || ''), domain: String(it.domain || ''),
+      date: it.date, ts: it.ts, link: safeUrl(it.link) || '#', image: safeUrl(it.image) };
     var featured = opts.featured;
-    var source = it.source || it.domain || '';
+    var source = it.source || it.domain;
     var rel = it.date ? relative(it.date) : '';
     var img = it.image
       ? '<img src="' + esc(it.image) + '" alt="" loading="' + (i < 3 ? 'eager' : 'lazy') + '" decoding="async" referrerpolicy="no-referrer">'
       : '';
     var cat = opts.cat ? byKey[opts.cat] : null;
-    return '<article class="card ph-' + phIndex(source) + (featured ? ' card--featured' : '') + (img ? '' : ' card--noimg') + (cat ? ' c-' + cat.color : '') + '" style="--i:' + Math.min(i, 12) + '">' +
+    return '<article class="card ph-' + phIndex(source) + (featured ? ' card--featured' : '') + (img ? '' : ' card--noimg') + (cat ? ' c-' + cat.color : '') + '">' +
       '<a class="card__media" href="' + esc(it.link) + '" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">' +
         img + '<span class="card__ph"><span>' + esc((source.charAt(0) || '•').toUpperCase()) + '</span></span></a>' +
       '<div class="card__body">' +

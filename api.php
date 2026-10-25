@@ -13,6 +13,8 @@ require __DIR__ . '/lib/feed.php';
 header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
 header('Cache-Control: public, max-age=300');
+header('X-Frame-Options: DENY');
+header("Content-Security-Policy: default-src 'none'; frame-ancestors 'none'");
 
 function veille_json($data, $code = 200)
 {
@@ -29,7 +31,7 @@ set_exception_handler(function ($e) {
     veille_json(array('ok' => false, 'error' => 'erreur interne'), 500);
 });
 
-if (isset($_GET['status'])) {
+if (isset($_GET['status']) && !empty($VEILLE_CONFIG['diagnostic'])) {
     $dir = $VEILLE_CONFIG['cache_dir'];
     $test = null;
     if (isset($_GET['test'])) {
@@ -48,12 +50,11 @@ if (isset($_GET['status'])) {
             'method'   => $r['method'],
             'ms'       => (int) round((microtime(true) - $t0) * 1000),
             'error'    => $r['error'],
-            'env_proxy'=> getenv('HTTPS_PROXY') ?: (getenv('https_proxy') ?: (getenv('HTTP_PROXY') ?: '')),
         );
     }
     veille_json(array(
         'ok'              => true,
-        'php'             => PHP_VERSION,
+        'php'             => PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
         'allow_url_fopen' => veille_ini_on('allow_url_fopen'),
         'openssl'         => extension_loaded('openssl'),
         'curl'            => function_exists('curl_init'),
@@ -64,22 +65,8 @@ if (isset($_GET['status'])) {
     ));
 }
 
-$want = isset($_GET['cat']) ? (string) $_GET['cat'] : '';
+$want = isset($_GET['cat']) && is_string($_GET['cat']) ? substr($_GET['cat'], 0, 40) : '';
 $force = isset($_GET['refresh']) && $_GET['refresh'] === '1';
-
-if ($want === 'all') {
-    $out = array('ok' => true, 'categories' => array());
-    foreach ($VEILLE_CATEGORIES as $c) {
-        $r = veille_get_category($VEILLE_CONFIG, $c, false);
-        $out['categories'][$c['key']] = array(
-            'status'  => $r['status'],
-            'fetched' => $r['fetched'],
-            'count'   => count($r['items']),
-            'items'   => $r['items'],
-        );
-    }
-    veille_json($out);
-}
 
 $cat = veille_find_category($VEILLE_CATEGORIES, $want);
 if (!$cat) {

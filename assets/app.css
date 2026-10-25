@@ -143,7 +143,9 @@ a { color: inherit; }
 
 /* --- Cartes ----------------------------------------------------------------- */
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; }
-.card { position: relative; display: flex; flex-direction: column; min-width: 0; background: var(--fond); border: 1px solid var(--filet); border-radius: var(--r); overflow: hidden; transition: border-color .2s, transform .2s; animation: rise .45s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i, 0) * 40ms); }
+.card { position: relative; display: flex; flex-direction: column; min-width: 0; background: var(--fond); border: 1px solid var(--filet); border-radius: var(--r); overflow: hidden; transition: border-color .2s, transform .2s; animation: rise .45s cubic-bezier(.2,.7,.2,1) both; }
+.card:nth-child(2) { animation-delay: 40ms; } .card:nth-child(3) { animation-delay: 80ms; } .card:nth-child(4) { animation-delay: 120ms; }
+.card:nth-child(5) { animation-delay: 160ms; } .card:nth-child(6) { animation-delay: 200ms; } .card:nth-child(n+7) { animation-delay: 240ms; }
 @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
 .card:hover { border-color: var(--noir); transform: translateY(-3px); }
 .card:focus-within { border-color: var(--noir); }

@@ -14,6 +14,18 @@ require __DIR__ . '/lib/render.php';
 
 ini_set('display_errors', '0');
 
+// En-têtes de sécurité : seules les sources nécessaires sont autorisées.
+$remoteOrigin = $VEILLE_CONFIG['remote_snapshot'] !== '' ? preg_replace('#^(https://[^/]+).*$#', '$1', $VEILLE_CONFIG['remote_snapshot']) : '';
+header("Content-Security-Policy: default-src 'self'; "
+    . "script-src 'self' https://analytics-sc.institut-agro.fr; "
+    . "connect-src 'self' https://analytics-sc.institut-agro.fr" . ($remoteOrigin ? ' ' . $remoteOrigin : '') . "; "
+    . "img-src 'self' https: data:; style-src 'self'; font-src 'self'; "
+    . "frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: SAMEORIGIN');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+
 // Rubrique demandée : ?cat=vigne (nouveau) ou ?id=2 (anciens permaliens).
 $default = veille_find_category($VEILLE_CATEGORIES, $VEILLE_CONFIG['default_cat']);
 if (!$default) { $default = $VEILLE_CATEGORIES[0]; }
@@ -34,6 +46,7 @@ $boot = array(
     'snapshot'   => 'data/feeds.json',
     'active'     => $active['key'],
     'default'    => $default['key'],
+    'matomo'     => (int) $VEILLE_CONFIG['matomo_site_id'],
     'categories' => array(),
     'initial'    => array('cat' => $active['key'], 'items' => $initial['items'], 'fetched' => $initial['fetched']),
 );
@@ -158,18 +171,6 @@ $v = '3.0.0';
 <script type="application/json" id="veille-boot"><?php echo json_encode($boot, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP); ?></script>
 <script src="assets/app.js?v=<?php echo $v; ?>" defer></script>
 
-<!-- Matomo -->
-<script>
-  var _paq = window._paq = window._paq || [];
-  _paq.push(['trackPageView']);
-  _paq.push(['enableLinkTracking']);
-  (function() {
-    var u = "https://analytics-sc.institut-agro.fr/";
-    _paq.push(['setTrackerUrl', u + 'matomo.php']);
-    _paq.push(['setSiteId', '<?php echo (int) $VEILLE_CONFIG['matomo_site_id']; ?>']);
-    var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
-    g.async = true; g.src = u + 'matomo.js'; s.parentNode.insertBefore(g, s);
-  })();
-</script>
+<script src="assets/matomo.js?v=<?php echo $v; ?>" defer></script>
 </body>
 </html>

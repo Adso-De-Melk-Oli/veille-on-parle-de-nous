@@ -26,12 +26,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-
-      - uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.3"
-          extensions: simplexml, openssl, mbstring
-          coverage: none
+          persist-credentials: false
+
+      # PHP est déjà installé sur les machines GitHub : aucune action tierce n'est utilisée.
+      - name: Vérifier PHP
+        run: php -v && php -m | grep -qi simplexml
 
       - name: Reprendre la dernière version publiée (garde les rubriques en panne)
         run: curl -fsSL "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/flux/feeds.json" -o data/feeds.json || echo "Première publication"
