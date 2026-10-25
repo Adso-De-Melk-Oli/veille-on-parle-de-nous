@@ -2,3 +2,7 @@ cache/*
 !cache/.htaccess
 config.local.php
 .DS_Store
+
+# Police sous licence : déposée sur le serveur, jamais publiée sur GitHub
+assets/fonts/*.woff2
+assets/fonts/*.woff

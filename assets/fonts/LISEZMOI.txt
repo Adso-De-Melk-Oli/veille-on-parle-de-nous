@@ -1,0 +1,2 @@
+Les fichiers Coco Sharp (CocoSharp-Regular.woff2, CocoSharp-Bold.woff2) ne sont pas publiés sur GitHub :
+ils sont sous licence. Ils sont fournis dans le zip de déploiement et doivent rester sur le serveur.
