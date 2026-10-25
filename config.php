@@ -39,7 +39,7 @@ $VEILLE_CATEGORIES = array(
     array('id' => 6,  'key' => 'numerique',     'group' => 'Axes stratégiques', 'label' => 'Agriculture numérique',          'color' => 'blue',   'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/Agriculture%20Num%C3%A9rique'),
     array('id' => 7,  'key' => 'agroecologie',  'group' => 'Axes stratégiques', 'label' => 'Agro-écologie',                  'color' => 'green',  'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/Agro-%C3%A9cologie'),
     array('id' => 8,  'key' => 'innovation',    'group' => 'Axes stratégiques', 'label' => 'Innovation & entrepreneuriat',   'color' => 'yellow', 'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/innovation'),
-    array('id' => 9,  'key' => 'fondation',     'group' => 'Réseau',            'label' => 'SupAgro Fondation',              'color' => 'yellow', 'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/FONDATION'),
+    array('id' => 9,  'key' => 'fondation',     'group' => 'Réseau',            'label' => 'Fondation',                      'color' => 'yellow', 'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/FONDATION'),
     array('id' => 10, 'key' => 'international', 'group' => 'Réseau',            'label' => "Vu de l'international",          'color' => 'purple', 'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/ENGLISH'),
     array('id' => 11, 'key' => 'accueil',       'group' => 'Réseau',            'label' => 'On accueille',                   'color' => 'pink',   'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/on%20accueille'),
 );
