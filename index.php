@@ -139,7 +139,7 @@ $v = '3.0.0';
       <p>Un outil développé et animé par le service communication de l'Institut Agro Montpellier.</p>
       <ul>
         <li><strong>Communication et relations presse</strong> <a href="mailto:ghyslaine.besancon@supagro.fr">ghyslaine.besancon@supagro.fr</a></li>
-        <li><strong>Accueil des colloques et événementiel</strong> <a href="mailto:florence.latapie@supagro.fr">florence.latapie@supagro.fr</a></li>
+        <li><strong>Accueil des colloques et événementiel</strong> <a href="mailto:laurent.cachard@supagro.fr">laurent.cachard@supagro.fr</a></li>
         <li><strong>Conception, veille et service web</strong> <a href="mailto:olivier.piau@supagro.fr">olivier.piau@supagro.fr</a></li>
       </ul>
       <p class="footer__legal">Version 3.0 · © <?php echo date('Y'); ?> L'Institut Agro Montpellier · Les articles restent la propriété de leurs éditeurs.</p>
