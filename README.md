@@ -28,7 +28,7 @@ Les anciens fichiers (`css/`, `js/`, `images/`, `fonts/` Lato) ne servent plus :
 | `assets/app.js` | Filtres, recherche, chargement, états d'erreur (JS natif, sans jQuery) |
 | `data/feeds.json` | Instantané de secours |
 
-### Pannes et erreurs de flux
+### Pannes et erreurs de flux (côté serveur, si `api.php` est utilisé)
 
 Pour chaque rubrique, dans cet ordre :
 
@@ -48,16 +48,22 @@ Prises dans le flux : `media:content`, `media:thumbnail`, `enclosure`, puis prem
 Les pictos, logos, boutons de partage et pixels de suivi sont écartés ; les images `http://` passent en `https://`.
 Une photo absente ou cassée est remplacée par un visuel aux couleurs de la charte (initiale du média sur une forme du logo).
 
-## Git et instantané automatique (facultatif)
+## Lecture des flux par GitHub (source principale)
 
-Le dépôt contient `.github/workflows/snapshot.yml` : chaque matin, GitHub lit les flux et met à jour `data/feeds.json`.
-Une étape FTP commentée permet de publier automatiquement sur le serveur.
+Le serveur SupAgro ne peut pas sortir sur Internet. C'est donc GitHub qui lit les flux :
 
-En l'absence de GitHub, une tâche cron sur n'importe quelle machine fait le même travail :
+1. `.github/workflows/snapshot.yml` tourne **toutes les 30 minutes** : il lit les 12 flux Inoreader
+   et publie le résultat dans la branche `flux` du dépôt (un seul fichier `feeds.json`, sans historique).
+2. La page charge ce fichier **depuis le navigateur du visiteur** (adresse `remote_snapshot` dans `config.php`).
+   Un seul téléchargement donne les 12 rubriques.
+3. Si GitHub ne répond pas, la page se rabat sur `api.php`, puis sur l'instantané local `data/feeds.json`.
+4. Une rubrique dont la dernière lecture réussie date de plus de 3 heures affiche le bandeau « momentanément indisponible ».
 
-```
-php scripts/snapshot.php
-```
+Le dépôt doit être **public** (le navigateur lit le fichier sans identifiant).
+Lancer une lecture à la main : onglet *Actions* → *Lecture des flux* → *Run workflow*.
+
+GitHub suspend les tâches planifiées d'un dépôt sans activité pendant 60 jours : il envoie alors un e-mail,
+et un clic sur *Enable workflow* suffit à les relancer.
 
 ## Ajouter une rubrique
 

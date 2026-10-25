@@ -28,6 +28,7 @@ $initial = veille_peek_category($VEILLE_CONFIG, $active);
 
 $boot = array(
     'api'        => 'api.php',
+    'remote'     => $VEILLE_CONFIG['remote_snapshot'],
     'snapshot'   => 'data/feeds.json',
     'active'     => $active['key'],
     'categories' => array(),
@@ -63,6 +64,8 @@ $v = '3.0.0';
 <meta property="og:image" content="<?php echo $e($VEILLE_CONFIG['site_url']); ?>assets/img/og-image.jpg">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="alternate icon" href="favicon.png" type="image/png">
+<?php if ($VEILLE_CONFIG['remote_snapshot'] !== ''): ?><link rel="preconnect" href="<?php echo $e(preg_replace('#^(https://[^/]+).*$#', '$1', $VEILLE_CONFIG['remote_snapshot'])); ?>" crossorigin>
+<?php endif; ?>
 <link rel="preload" href="assets/fonts/CocoSharp-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/app.css?v=<?php echo $v; ?>">
 <?php foreach ($VEILLE_CATEGORIES as $c): ?>

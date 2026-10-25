@@ -72,10 +72,45 @@
     });
   }
 
+  /* Source principale : le fichier publié par GitHub toutes les 30 minutes (toutes les rubriques d'un coup).
+     Le serveur SupAgro n'a pas besoin de sortir sur Internet : c'est le navigateur qui le lit. */
+  var STALE_HOURS = 3;
+  var remotePromise = null, remoteAt = 0;
+  function loadRemote(force) {
+    if (!BOOT.remote) return Promise.resolve(null);
+    if (!remotePromise || force || Date.now() - remoteAt > 600000) {
+      remoteAt = Date.now();
+      var bust = force ? Date.now() : Math.floor(Date.now() / 300000);
+      var url = BOOT.remote + (BOOT.remote.indexOf('?') === -1 ? '?' : '&') + 't=' + bust;
+      remotePromise = new Promise(function (resolve) {
+        var timer = setTimeout(function () { resolve(null); }, 10000);
+        fetch(url, { credentials: 'omit', cache: 'no-cache' })
+          .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })  // GitHub sert text/plain : pas de contrôle du type
+          .then(function (j) { clearTimeout(timer); resolve(j && j.categories ? j : null); })
+          .catch(function () { clearTimeout(timer); resolve(null); });
+      });
+    }
+    return remotePromise;
+  }
+
   function load(key, force, refresh) {
     if (!force && state.data[key] && state.data[key].status !== 'boot') return Promise.resolve(state.data[key]);
     if (!force && state.pending[key]) return state.pending[key];
 
+    var p = loadRemote(refresh).then(function (remote) {
+      var c = remote && remote.categories[key];
+      if (c && c.items && c.items.length) {
+        var fetched = c.fetched || remote.generated || null;
+        var age = fetched ? (Date.now() - new Date(fetched).getTime()) / 3600000 : 0;
+        return { items: c.items, status: age > STALE_HOURS ? 'stale' : 'fresh', fetched: fetched, error: '' };
+      }
+      return fromServer(key, refresh);
+    });
+    return finish(key, p);
+  }
+
+  /* Repli : api.php (si le serveur peut lire les flux), puis l'instantané local data/feeds.json. */
+  function fromServer(key, refresh) {
     var p;
     if (state.mode === 'api') {
       p = fetchJSON(BOOT.api + '?cat=' + encodeURIComponent(key) + (refresh ? '&refresh=1' : ''), 25000)
@@ -94,7 +129,10 @@
     } else {
       p = fromSnapshot(key);
     }
+    return p;
+  }
 
+  function finish(key, p) {
     p = p.then(function (d) {
       // Ne jamais remplacer des articles affichés par une liste vide.
       var prev = state.data[key];

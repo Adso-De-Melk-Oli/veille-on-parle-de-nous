@@ -1,45 +1,53 @@
-# Met à jour chaque matin data/feeds.json, l'instantané de secours affiché
-# quand un flux est en panne et que le serveur n'a encore aucun cache.
-name: Instantané de la veille
+# Toutes les 30 minutes, GitHub lit les 12 flux Inoreader et publie le résultat
+# dans la branche « flux » (un seul fichier, feeds.json, sans historique).
+# La page le lit ensuite directement depuis le navigateur des visiteurs :
+#   https://raw.githubusercontent.com/<compte>/<dépôt>/flux/feeds.json
+# Le serveur SupAgro n'a donc jamais besoin de sortir sur Internet.
+name: Lecture des flux
 
 on:
   schedule:
-    - cron: "17 5 * * *"   # chaque matin, vers 6h-7h heure de Paris
-  workflow_dispatch: {}
+    - cron: "7,37 * * * *"   # toutes les 30 min (GitHub peut décaler de quelques minutes)
+  workflow_dispatch: {}       # bouton « Run workflow » pour lancer à la main
+  push:
+    branches: [main]
+    paths: ["config.php", "lib/**", "scripts/**"]
 
 permissions:
   contents: write
 
+concurrency:
+  group: lecture-des-flux
+  cancel-in-progress: false
+
 jobs:
-  snapshot:
+  flux:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: "8.3"
           extensions: simplexml, openssl, mbstring
           coverage: none
+
+      - name: Reprendre la dernière version publiée (garde les rubriques en panne)
+        run: curl -fsSL "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/flux/feeds.json" -o data/feeds.json || echo "Première publication"
+
       - name: Lire les flux
         run: php scripts/snapshot.php
-      - name: Enregistrer s'il y a du nouveau
+
+      - name: Publier dans la branche « flux »
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if git diff --quiet -- data/feeds.json; then echo "Rien de nouveau"; exit 0; fi
+          mkdir -p /tmp/flux && cp data/feeds.json /tmp/flux/feeds.json
+          cd /tmp/flux
+          git init -q -b flux
           git config user.name "veille-bot"
           git config user.email "veille-bot@users.noreply.github.com"
-          git add data/feeds.json
-          git commit -m "Instantané de la veille du $(date -u +%F)"
-          git push
-
-      # Facultatif : publier automatiquement sur le serveur SupAgro par FTP.
-      # Créer les secrets FTP_SERVER, FTP_USERNAME, FTP_PASSWORD dans le dépôt, puis décommenter.
-      # - uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-      #   with:
-      #     server: ${{ secrets.FTP_SERVER }}
-      #     username: ${{ secrets.FTP_USERNAME }}
-      #     password: ${{ secrets.FTP_PASSWORD }}
-      #     server-dir: /web/services/on-parle-de-nous/
-      #     exclude: |
-      #       **/.git*/**
-      #       tests/**
-      #       cache/*.json
+          git add feeds.json
+          git commit -qm "Flux du $(date -u +'%Y-%m-%d %H:%M') UTC"
+          git push -qf "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" flux
