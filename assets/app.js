@@ -297,6 +297,13 @@
     return ' · mis à jour ' + (today ? 'à ' + hm : 'le ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + ' à ' + hm);
   }
 
+  function infoBanner(iso) {
+    var when = updatedLabel(iso).replace(' · mis à jour ', '').replace(/^à /, "aujourd'hui à ");
+    if (!when) return '<p>Revue de presse actualisée automatiquement plusieurs fois par jour.</p>';
+    return '<p><strong>Revue de presse mise à jour ' + esc(when) + '.</strong> ' +
+      'Elle est actualisée automatiquement plusieurs fois par jour : les articles les plus récents apparaîtront à la prochaine mise à jour.</p>';
+  }
+
   function render() {
     var q = state.query.trim();
     var cardsEl = slot('cards');
@@ -338,13 +345,8 @@
     }
     main.setAttribute('aria-busy', state.pending[state.active] ? 'true' : 'false');
 
-    // Bandeau d'état
-    if (d.status === 'stale' || d.status === 'snapshot') {
-      notice('<p>La mise à jour de cette rubrique est momentanément interrompue. Vous consultez la dernière version enregistrée' +
-        (d.fetched ? ', du ' + esc(fetchedLabel(d.fetched)) : '') + '.</p><button type="button" data-action="retry">Réessayer</button>');
-    } else {
-      notice('');
-    }
+    // Bandeau d'information : toujours neutre, jamais un message d'erreur.
+    notice(infoBanner(d.fetched));
 
     if (!d.items.length) {
       slot('meta').textContent = '';
@@ -356,7 +358,7 @@
     var list = d.items.filter(function (it) { return matches(it, q); });
     slot('meta').textContent = q
       ? list.length + ' sur ' + d.items.length + ' article' + (d.items.length > 1 ? 's' : '')
-      : d.items.length + ' article' + (d.items.length > 1 ? 's' : '') + updatedLabel(d.fetched);
+      : d.items.length + ' article' + (d.items.length > 1 ? 's' : '');
 
     if (!list.length) {
       cardsEl.innerHTML = emptyState('Aucun article ne correspond', 'Aucun article de cette rubrique ne contient « ' + esc(q) + ' ». Cochez « dans toutes les rubriques » pour élargir la recherche.', false);

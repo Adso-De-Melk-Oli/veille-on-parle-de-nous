@@ -57,8 +57,8 @@ Le serveur SupAgro ne peut pas sortir sur Internet. C'est donc GitHub qui lit le
 2. La page charge ce fichier **depuis le navigateur du visiteur** (adresse `remote_snapshot` dans `config.php`).
    Un seul téléchargement donne les 12 rubriques.
 3. Si GitHub ne répond pas, la page se rabat sur `api.php`, puis sur l'instantané local `data/feeds.json`.
-4. La date de la dernière lecture s'affiche à côté du nombre d'articles. Le bandeau « mise à jour interrompue » n'apparaît
-   que si la dernière lecture réussie date de plus de 24 heures.
+4. Un bandeau d'information, au ton neutre, indique toujours l'heure de la dernière mise à jour
+   (« Revue de presse mise à jour aujourd'hui à 11h58… »). Il ne présente jamais un retard comme une panne.
 
 GitHub espace en pratique les tâches planifiées des petits dépôts (souvent toutes les 4 à 6 heures).
 
