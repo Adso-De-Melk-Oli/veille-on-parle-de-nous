@@ -57,7 +57,10 @@ Le serveur SupAgro ne peut pas sortir sur Internet. C'est donc GitHub qui lit le
 2. La page charge ce fichier **depuis le navigateur du visiteur** (adresse `remote_snapshot` dans `config.php`).
    Un seul téléchargement donne les 12 rubriques.
 3. Si GitHub ne répond pas, la page se rabat sur `api.php`, puis sur l'instantané local `data/feeds.json`.
-4. Une rubrique dont la dernière lecture réussie date de plus de 3 heures affiche le bandeau « momentanément indisponible ».
+4. La date de la dernière lecture s'affiche à côté du nombre d'articles. Le bandeau « mise à jour interrompue » n'apparaît
+   que si la dernière lecture réussie date de plus de 24 heures.
+
+GitHub espace en pratique les tâches planifiées des petits dépôts (souvent toutes les 4 à 6 heures).
 
 Le dépôt doit être **public** (le navigateur lit le fichier sans identifiant).
 Lancer une lecture à la main : onglet *Actions* → *Lecture des flux* → *Run workflow*.

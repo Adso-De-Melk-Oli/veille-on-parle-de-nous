@@ -7,7 +7,7 @@ name: Lecture des flux
 
 on:
   schedule:
-    - cron: "7,37 * * * *"   # toutes les 30 min (GitHub peut décaler de quelques minutes)
+    - cron: "7,22,37,52 * * * *"   # demandé tous les quarts d'heure : GitHub en saute une partie
   workflow_dispatch: {}       # bouton « Run workflow » pour lancer à la main
   push:
     branches: [main]

@@ -76,7 +76,8 @@
 
   /* Source principale : le fichier publié par GitHub toutes les 30 minutes (toutes les rubriques d'un coup).
      Le serveur SupAgro n'a pas besoin de sortir sur Internet : c'est le navigateur qui le lit. */
-  var STALE_HOURS = 3;
+  // GitHub espace souvent les lectures (4 à 6 h). Le bandeau ne s'affiche que pour une vraie panne.
+  var STALE_HOURS = 24;
   var remotePromise = null, remoteAt = 0;
   function loadRemote(force) {
     if (!BOOT.remote) return Promise.resolve(null);
@@ -286,6 +287,16 @@
     return dateFr(iso) + ' à ' + ('0' + d.getHours()).slice(-2) + 'h' + ('0' + d.getMinutes()).slice(-2);
   }
 
+  // « · mis à jour à 11h54 » (ou « le 26 octobre à 11h54 » si ce n'est pas aujourd'hui)
+  function updatedLabel(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    if (isNaN(d)) return '';
+    var hm = ('0' + d.getHours()).slice(-2) + 'h' + ('0' + d.getMinutes()).slice(-2);
+    var today = new Date().toDateString() === d.toDateString();
+    return ' · mis à jour ' + (today ? 'à ' + hm : 'le ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + ' à ' + hm);
+  }
+
   function render() {
     var q = state.query.trim();
     var cardsEl = slot('cards');
@@ -329,7 +340,7 @@
 
     // Bandeau d'état
     if (d.status === 'stale' || d.status === 'snapshot') {
-      notice('<p>Le flux de cette rubrique est momentanément indisponible. Vous consultez la dernière version enregistrée' +
+      notice('<p>La mise à jour de cette rubrique est momentanément interrompue. Vous consultez la dernière version enregistrée' +
         (d.fetched ? ', du ' + esc(fetchedLabel(d.fetched)) : '') + '.</p><button type="button" data-action="retry">Réessayer</button>');
     } else {
       notice('');
@@ -345,7 +356,7 @@
     var list = d.items.filter(function (it) { return matches(it, q); });
     slot('meta').textContent = q
       ? list.length + ' sur ' + d.items.length + ' article' + (d.items.length > 1 ? 's' : '')
-      : d.items.length + ' article' + (d.items.length > 1 ? 's' : '');
+      : d.items.length + ' article' + (d.items.length > 1 ? 's' : '') + updatedLabel(d.fetched);
 
     if (!list.length) {
       cardsEl.innerHTML = emptyState('Aucun article ne correspond', 'Aucun article de cette rubrique ne contient « ' + esc(q) + ' ». Cochez « dans toutes les rubriques » pour élargir la recherche.', false);
