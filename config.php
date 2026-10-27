@@ -39,8 +39,8 @@ $VEILLE_CONFIG = array(
 );
 
 $VEILLE_CATEGORIES = array(
-    array('id' => 0,  'key' => 'institut',      'group' => 'Établissement',     'label' => "L'Institut Agro",                'color' => 'orange', 'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/Institut%20Agro'),
-    array('id' => 1,  'key' => 'general',       'group' => 'Établissement',     'label' => 'Général',                        'color' => 'orange', 'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/general'),
+    array('id' => 0,  'key' => 'institut',      'group' => 'Établissement & École', 'label' => "L'Institut Agro",                'color' => 'orange', 'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/Institut%20Agro'),
+    array('id' => 1,  'key' => 'general',       'group' => 'Établissement & École', 'label' => "L'Institut Agro Montpellier",     'color' => 'orange', 'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/general'),
     array('id' => 2,  'key' => 'vigne',         'group' => 'Thématiques',       'label' => 'Vigne et vin',                   'color' => 'purple', 'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/IHEV'),
     array('id' => 3,  'key' => 'sud',           'group' => 'Thématiques',       'label' => 'Développement durable au sud',   'color' => 'green',  'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/IRC'),
     array('id' => 4,  'key' => 'enseignement',  'group' => 'Thématiques',       'label' => "Appui à l'enseignement agricole", 'color' => 'blue',   'feed' => 'https://www.inoreader.com/stream/user/1005705226/tag/FLORAC'),
