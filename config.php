@@ -28,7 +28,7 @@ $VEILLE_CONFIG = array(
     'cache_dir'      => VEILLE_ROOT . '/cache',
     // Fichier publié par GitHub toutes les 30 min, lu directement par le navigateur des visiteurs.
     // C'est la source principale quand le serveur ne peut pas sortir sur Internet. Vide = désactivé.
-    'remote_snapshot' => 'https://raw.githubusercontent.com/veille-institut-agro-montpellier/veille-on-parle-de-nous/flux/feeds.json',
+    'remote_snapshot' => 'https://raw.githubusercontent.com/veille-institut-agro-montpellier/on-parle-de-nous/flux/feeds.json',
     // Instantané de secours (généré par scripts/snapshot.php ou par l'action GitHub).
     'snapshot_file'  => VEILLE_ROOT . '/data/feeds.json',
     'user_agent'     => 'VeilleInstitutAgroMontpellier/3.0 (+https://www.supagro.fr/web/services/on-parle-de-nous/)',
