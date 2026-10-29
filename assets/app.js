@@ -77,14 +77,17 @@
   /* Source principale : le fichier publié par GitHub toutes les 30 minutes (toutes les rubriques d'un coup).
      Le serveur SupAgro n'a pas besoin de sortir sur Internet : c'est le navigateur qui le lit. */
   // GitHub espace souvent les lectures (4 à 6 h). Le bandeau ne s'affiche que pour une vraie panne.
+  var REMOTE = '';
+  try { REMOTE = BOOT.src ? atob(BOOT.src).split('').reverse().join('') : ''; } catch (e) { REMOTE = ''; }
+  if (!/^https:\/\//.test(REMOTE)) REMOTE = '';
   var STALE_HOURS = 24;
   var remotePromise = null, remoteAt = 0;
   function loadRemote(force) {
-    if (!BOOT.remote) return Promise.resolve(null);
+    if (!REMOTE) return Promise.resolve(null);
     if (!remotePromise || force || Date.now() - remoteAt > 600000) {
       remoteAt = Date.now();
       var bust = force ? Date.now() : Math.floor(Date.now() / 300000);
-      var url = BOOT.remote + (BOOT.remote.indexOf('?') === -1 ? '?' : '&') + 't=' + bust;
+      var url = REMOTE + (REMOTE.indexOf('?') === -1 ? '?' : '&') + 't=' + bust;
       remotePromise = new Promise(function (resolve) {
         var timer = setTimeout(function () { resolve(null); }, 10000);
         fetch(url, { credentials: 'omit', cache: 'no-cache' })

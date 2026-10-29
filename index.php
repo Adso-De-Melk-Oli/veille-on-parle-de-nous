@@ -42,7 +42,8 @@ $initial = veille_peek_category($VEILLE_CONFIG, $active);
 
 $boot = array(
     'api'        => 'api.php',
-    'remote'     => $VEILLE_CONFIG['remote_snapshot'],
+    // Adresse encodée : elle n'apparaît pas en clair dans le code source de la page.
+    'src'        => $VEILLE_CONFIG['remote_snapshot'] !== '' ? base64_encode(strrev($VEILLE_CONFIG['remote_snapshot'])) : '',
     'snapshot'   => 'data/feeds.json',
     'active'     => $active['key'],
     'default'    => $default['key'],
